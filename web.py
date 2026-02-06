@@ -121,7 +121,7 @@ with st.sidebar:
     if st.button("🔄 Đồng Bộ Ngay (Tải lại)", type="primary"):
         st.session_state.manager = load_data_from_github()
         st.rerun()
-    st.info("Dữ liệu được lưu trực tiếp vào file `data.json` trên GitHub của bạn. Không bao giờ mất!")
+
 
 tab1, tab2, tab3 = st.tabs(["1. Dữ Liệu", "2. Chi Tiết", "3. Biểu Đồ"])
 
