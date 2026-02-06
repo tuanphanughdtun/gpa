@@ -114,7 +114,7 @@ if 'manager' not in st.session_state:
         st.session_state.manager = load_data_from_github()
 
 # --- GIAO DIỆN ---
-st.title("☁️ GPA Manager - Lưu Trữ Đám Mây")
+st.title("GPA")
 
 with st.sidebar:
     st.header("Hệ Thống")
