@@ -204,6 +204,13 @@
       "semester": "242",
       "credits": 2,
       "score_10": 6.6
+    },
+    {
+      "code": "ME3129",
+      "name": "Thực Tập Ngoài Trường",
+      "semester": "242",
+      "credits": 2,
+      "score_10": 8.5
     }
   ]
 }
