@@ -108,13 +108,29 @@ st.title("☁️ GPA Sync - Đồng bộ PC & Mobile")
 with st.sidebar:
     st.header("⚙️ Hệ Thống")
     
-    # Nút này quan trọng để đồng bộ: Khi bạn nhập trên điện thoại, PC bấm nút này để lấy dữ liệu mới nhất
-    if st.button("🔄 Tải Lại Dữ Liệu (Sync)", type="primary"):
-        st.session_state.manager = load_data_from_disk()
-        st.rerun()
-        
-    st.info("💡 Mẹo: Dữ liệu được lưu tự động vào file máy tính. Mở trên điện thoại sẽ thấy ngay.")
-
+    # 1. Nút tải dữ liệu về máy (An toàn nhất)
+    # Chuyển đổi dữ liệu hiện tại sang JSON chuỗi
+    json_str = json.dumps([s.to_dict() for s in st.session_state.manager.subjects], ensure_ascii=False)
+    
+    st.download_button(
+        label="⬇️ Tải Dữ Liệu Về Máy (Backup)",
+        data=json_str,
+        file_name="gpa_backup.json",
+        mime="application/json"
+    )
+    
+    # 2. Nút Upload dữ liệu lên (Restore)
+    uploaded_file = st.file_uploader("⬆️ Tải File Cũ Lên (Restore)", type=['json'])
+    if uploaded_file is not None:
+        try:
+            data = json.load(uploaded_file)
+            st.session_state.manager.subjects = []
+            for d in data:
+                st.session_state.manager.add_subject(d['code'], d['name'], d['semester'], d['credits'], d['score_10'])
+            st.success("Đã khôi phục dữ liệu!")
+            st.rerun()
+        except:
+            st.error("File lỗi!")
 # TABS
 tab1, tab2, tab3 = st.tabs(["1. Nhập Liệu", "2. Chi Tiết", "3. Biểu Đồ"])
 
