@@ -43,6 +43,13 @@
       "semester": "222",
       "credits": 3,
       "score_10": 7.0
+    },
+    {
+      "code": "MT1005",
+      "name": "Giải Tích 2",
+      "semester": "222",
+      "credits": 4,
+      "score_10": 6.2
     }
   ]
 }
