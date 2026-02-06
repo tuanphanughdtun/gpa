@@ -97,7 +97,6 @@ class GPAManager:
         if tc == 0: return 0, 0.0
         return tc, sum(s.score_4 * s.credits for s in final) / tc
     
-    # [MỚI] Hàm tính xếp loại học lực
     def get_rank(self, cpa):
         if cpa >= 3.6: return "Xuất sắc"
         elif cpa >= 3.2: return "Giỏi"
@@ -120,7 +119,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA")
+st.title("🎓 GPA Manager - Multi User")
 
 with st.sidebar:
     st.header("🔑 Đăng Nhập")
@@ -173,6 +172,7 @@ with tab1:
                     st.session_state.k_score = found.score_10
                     st.rerun()
         
+        # State Initialization
         if 'k_sem' not in st.session_state: st.session_state.k_sem = ""
         if 'k_code' not in st.session_state: st.session_state.k_code = ""
         if 'k_name' not in st.session_state: st.session_state.k_name = ""
@@ -198,7 +198,7 @@ with tab1:
             st.session_state.manager.delete_subject(code, sem)
             save_current_student_to_github(student_id); st.rerun()
 
-    # --- BẢNG DỮ LIỆU TAB 1 ---
+    # --- BẢNG DỮ LIỆU TƯƠNG TÁC (CLICK TO SELECT) ---
     table_data = []
     for sub in st.session_state.manager.subjects:
         note = st.session_state.manager.get_comparison_note(sub)
@@ -209,23 +209,55 @@ with tab1:
             "TC": str(sub.credits), 
             "Điểm (10)": f"{sub.score_10:.1f}", 
             "Điểm (4)": f"{sub.score_4:.1f}", 
-            "Điểm Chữ": sub.score_char
+            "Chữ": sub.score_char
         })
     
     if table_data:
         df = pd.DataFrame(table_data).sort_values("HK")
-        st.dataframe(
+        
+        # [MỚI] Bảng có khả năng chọn hàng (on_select)
+        event = st.dataframe(
             df.style.set_properties(**{'text-align': 'left'}),
-            use_container_width=True, hide_index=True
+            use_container_width=True, 
+            hide_index=True,
+            on_select="rerun",           # Bấm vào là chạy lại app để điền dữ liệu
+            selection_mode="single-row"  # Chỉ cho chọn 1 dòng
         )
+        
+        # [MỚI] Xử lý khi người dùng chọn 1 dòng
+        if len(event.selection.rows) > 0:
+            selected_idx = event.selection.rows[0]
+            # Lấy dữ liệu từ dòng đã chọn (lưu ý df đã sort nên phải dùng iloc)
+            selected_row = df.iloc[selected_idx]
+            
+            sel_code = selected_row["Mã"]
+            sel_sem = selected_row["HK"]
+            
+            # Tìm môn học gốc trong database để lấy dữ liệu sạch (số thực, tên gốc)
+            found_sub = None
+            for s in st.session_state.manager.subjects:
+                if s.code == sel_code and s.semester == sel_sem:
+                    found_sub = s; break
+            
+            # Điền lên form nếu tìm thấy và dữ liệu đang khác nhau
+            if found_sub:
+                if (st.session_state.k_code != found_sub.code or 
+                    st.session_state.k_sem != found_sub.semester or
+                    st.session_state.k_score != found_sub.score_10):
+                    
+                    st.session_state.k_sem = found_sub.semester
+                    st.session_state.k_code = found_sub.code
+                    st.session_state.k_name = found_sub.name
+                    st.session_state.k_cred = found_sub.credits
+                    st.session_state.k_score = found_sub.score_10
+                    st.rerun()
+
     else: st.info("Chưa có dữ liệu.")
     
     accum, cpa = st.session_state.manager.calculate_cpa()
-    # [MỚI] Lấy xếp loại
     rank = st.session_state.manager.get_rank(cpa)
     
     st.divider()
-    # [MỚI] Chia làm 3 cột để hiện Xếp loại
     m1, m2, m3 = st.columns(3)
     m1.metric("GPA Tích Lũy", f"{cpa:.2f}")
     m2.metric("Xếp Loại", f"{rank}", delta_color="off")
@@ -236,7 +268,6 @@ with tab2:
     for sem, subs in sem_data.items():
         tc = sum(s.credits for s in subs)
         gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-        # [MỚI] Hiện xếp loại từng kỳ
         rank_sem = st.session_state.manager.get_rank(gpa)
         
         with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f} - {rank_sem})", expanded=True):
@@ -249,7 +280,7 @@ with tab2:
                     "TC": str(s.credits),
                     "Điểm (10)": f"{s.score_10:.1f}",
                     "Điểm (4)": f"{s.score_4:.1f}",
-                    "Điểm Chữ": s.score_char
+                    "Chữ": s.score_char
                 })
             
             df_sem = pd.DataFrame(sem_table_data)
