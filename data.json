@@ -190,6 +190,13 @@
       "semester": "242",
       "credits": 3,
       "score_10": 7.5
+    },
+    {
+      "code": "ME3223",
+      "name": "Quản Lý Dự Án",
+      "semester": "242",
+      "credits": 3,
+      "score_10": 7.4
     }
   ]
 }
