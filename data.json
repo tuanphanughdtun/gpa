@@ -29,6 +29,13 @@
       "semester": "221",
       "credits": 4,
       "score_10": 6.9
+    },
+    {
+      "code": "CH1003",
+      "name": "Hoá Đại Cương",
+      "semester": "221",
+      "credits": 3,
+      "score_10": 7.4
     }
   ]
 }
