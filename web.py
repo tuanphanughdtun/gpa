@@ -5,7 +5,7 @@ import json
 from github import Github
 
 # --- CẤU HÌNH ---
-st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
+st.set_page_config(page_title="GPA", layout="wide", page_icon="🎓")
 DATA_FILE = "data.json"
 
 # --- CSS: CĂN TRÁI CHO SỐ VÀ BẢNG ---
@@ -116,7 +116,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA Manager - Bảo Mật")
+st.title("🎓 GPA")
 
 # --- SIDEBAR: ĐĂNG NHẬP ---
 with st.sidebar:
@@ -220,7 +220,7 @@ with tab1:
                 "TC": str(sub.credits), 
                 "Điểm (10)": f"{sub.score_10:.1f}", 
                 "Điểm (4)": f"{sub.score_4:.1f}", 
-                "Chữ": sub.score_char
+                "Điểm Chữ": sub.score_char
             })
         
         if table_data:
@@ -334,7 +334,7 @@ with tab2:
                 note = st.session_state.manager.get_comparison_note(s)
                 sem_table_data.append({
                     "Mã": s.code, "Tên": f"{s.name}{note}", "TC": str(s.credits),
-                    "Điểm (10)": f"{s.score_10:.1f}", "Điểm (4)": f"{s.score_4:.1f}", "Chữ": s.score_char
+                    "Điểm (10)": f"{s.score_10:.1f}", "Điểm (4)": f"{s.score_4:.1f}", "Điểm Chữ": s.score_char
                 })
             st.dataframe(pd.DataFrame(sem_table_data).style.set_properties(**{'text-align': 'left'}), use_container_width=True, hide_index=True)
 
