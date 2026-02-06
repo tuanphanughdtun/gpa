@@ -127,7 +127,7 @@ with st.sidebar:
     st.divider()
     st.header("Hệ Thống")
     if student_id:
-        if st.button("🔄 Đồng Bộ (Tải lại)", type="primary"):
+        if st.button("🔄 Đồng Bộ", type="primary"):
             if 'full_db' in st.session_state: del st.session_state.full_db
             st.rerun()
         st.success(f"User: **{student_id}**")
