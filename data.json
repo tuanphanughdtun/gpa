@@ -169,6 +169,13 @@
       "semester": "241",
       "credits": 3,
       "score_10": 7.9
+    },
+    {
+      "code": "ME2141",
+      "name": "Kỹ Thuật Dự Báo",
+      "semester": "241",
+      "credits": 3,
+      "score_10": 9.0
     }
   ]
 }
