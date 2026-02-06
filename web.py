@@ -5,7 +5,7 @@ import json
 from github import Github
 
 # --- CẤU HÌNH ---
-st.set_page_config(page_title="GPA", layout="wide", page_icon="🎓")
+st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
 DATA_FILE = "data.json"
 
 # --- CSS: CĂN TRÁI CHO SỐ VÀ BẢNG ---
@@ -96,6 +96,15 @@ class GPAManager:
         tc = sum(s.credits for s in final)
         if tc == 0: return 0, 0.0
         return tc, sum(s.score_4 * s.credits for s in final) / tc
+    
+    # [MỚI] Hàm tính xếp loại học lực
+    def get_rank(self, cpa):
+        if cpa >= 3.6: return "Xuất sắc"
+        elif cpa >= 3.2: return "Giỏi"
+        elif cpa >= 2.5: return "Khá"
+        elif cpa >= 2.0: return "Trung bình"
+        else: return "Yếu"
+
     def get_comparison_note(self, current_sub):
         duplicates = [s for s in self.subjects if s.code == current_sub.code and s is not current_sub]
         notes = []
@@ -111,7 +120,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA")
+st.title("🎓 GPA Manager - Multi User")
 
 with st.sidebar:
     st.header("🔑 Đăng Nhập")
@@ -197,9 +206,9 @@ with tab1:
             "HK": sub.semester, 
             "Mã": sub.code, 
             "Tên": f"{sub.name}{note}", 
-            "TC": str(sub.credits),             # <-- CHUYỂN THÀNH CHUỖI ĐỂ CĂN TRÁI
-            "Điểm (10)": f"{sub.score_10:.1f}", # <-- LẤY 1 SỐ LẺ
-            "Điểm (4)": f"{sub.score_4:.1f}",   # <-- LẤY 1 SỐ LẺ
+            "TC": str(sub.credits), 
+            "Điểm (10)": f"{sub.score_10:.1f}", 
+            "Điểm (4)": f"{sub.score_4:.1f}", 
             "Chữ": sub.score_char
         })
     
@@ -212,27 +221,34 @@ with tab1:
     else: st.info("Chưa có dữ liệu.")
     
     accum, cpa = st.session_state.manager.calculate_cpa()
+    # [MỚI] Lấy xếp loại
+    rank = st.session_state.manager.get_rank(cpa)
+    
     st.divider()
-    m1, m2 = st.columns(2)
+    # [MỚI] Chia làm 3 cột để hiện Xếp loại
+    m1, m2, m3 = st.columns(3)
     m1.metric("GPA Tích Lũy", f"{cpa:.2f}")
-    m2.metric("Tín Chỉ Tích Lũy", f"{accum}")
+    m2.metric("Xếp Loại", f"{rank}", delta_color="off")
+    m3.metric("Tín Chỉ Tích Lũy", f"{accum}")
 
 with tab2:
     sem_data = st.session_state.manager.get_sem_data()
     for sem, subs in sem_data.items():
         tc = sum(s.credits for s in subs)
         gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-        with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f})", expanded=True):
-            # --- BẢNG DỮ LIỆU TAB 2 ---
+        # [MỚI] Hiện xếp loại từng kỳ
+        rank_sem = st.session_state.manager.get_rank(gpa)
+        
+        with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f} - {rank_sem})", expanded=True):
             sem_table_data = []
             for s in subs:
                 note = st.session_state.manager.get_comparison_note(s)
                 sem_table_data.append({
                     "Mã": s.code,
                     "Tên": f"{s.name}{note}",
-                    "TC": str(s.credits),             # <-- CHUYỂN THÀNH CHUỖI ĐỂ CĂN TRÁI
-                    "Điểm (10)": f"{s.score_10:.1f}", # <-- LẤY 1 SỐ LẺ
-                    "Điểm (4)": f"{s.score_4:.1f}",   # <-- LẤY 1 SỐ LẺ
+                    "TC": str(s.credits),
+                    "Điểm (10)": f"{s.score_10:.1f}",
+                    "Điểm (4)": f"{s.score_4:.1f}",
                     "Chữ": s.score_char
                 })
             
