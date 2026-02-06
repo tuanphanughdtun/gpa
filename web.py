@@ -197,9 +197,9 @@ with tab1:
             "HK": sub.semester, 
             "Mã": sub.code, 
             "Tên": f"{sub.name}{note}", 
-            "TC": sub.credits, 
-            "Điểm (10)": f"{sub.score_10:.2f}", # Format 2 số lẻ
-            "Điểm (4)": f"{sub.score_4:.2f}",   # Thêm cột điểm 4
+            "TC": str(sub.credits),             # <-- CHUYỂN THÀNH CHUỖI ĐỂ CĂN TRÁI
+            "Điểm (10)": f"{sub.score_10:.1f}", # <-- LẤY 1 SỐ LẺ
+            "Điểm (4)": f"{sub.score_4:.1f}",   # <-- LẤY 1 SỐ LẺ
             "Chữ": sub.score_char
         })
     
@@ -223,17 +223,17 @@ with tab2:
         tc = sum(s.credits for s in subs)
         gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
         with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f})", expanded=True):
-            # --- BẢNG DỮ LIỆU TAB 2 (CHI TIẾT) ---
+            # --- BẢNG DỮ LIỆU TAB 2 ---
             sem_table_data = []
             for s in subs:
                 note = st.session_state.manager.get_comparison_note(s)
                 sem_table_data.append({
                     "Mã": s.code,
                     "Tên": f"{s.name}{note}",
-                    "TC": s.credits,
-                    "Điểm (10)": f"{s.score_10:.2f}", # Format 2 số lẻ
-                    "Điểm (4)": f"{s.score_4:.2f}",   # Thêm cột điểm 4
-                    "Chữ": s.score_char               # Thêm cột điểm Chữ
+                    "TC": str(s.credits),             # <-- CHUYỂN THÀNH CHUỖI ĐỂ CĂN TRÁI
+                    "Điểm (10)": f"{s.score_10:.1f}", # <-- LẤY 1 SỐ LẺ
+                    "Điểm (4)": f"{s.score_4:.1f}",   # <-- LẤY 1 SỐ LẺ
+                    "Chữ": s.score_char
                 })
             
             df_sem = pd.DataFrame(sem_table_data)
