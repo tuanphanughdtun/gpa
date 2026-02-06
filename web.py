@@ -2,55 +2,66 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
-from github import Github # Thư viện kết nối GitHub
+from github import Github
 
 # --- CẤU HÌNH ---
-st.set_page_config(page_title="GPA Cloud Sync", layout="wide", page_icon="☁️")
-DATA_FILE = "data.json" # Tên file sẽ lưu trên GitHub
+st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
+DATA_FILE = "data.json"
 
-# --- KẾT NỐI GITHUB ---
+# --- [MỚI] CSS ĐỂ CĂN TRÁI SỐ TRONG Ô NHẬP ---
+st.markdown("""
+<style>
+    /* Căn trái chữ số bên trong ô nhập liệu */
+    input[inputmode="decimal"] {
+        text-align: left !important;
+    }
+    input[type="number"] {
+        text-align: left !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- KẾT NỐI GITHUB & XỬ LÝ DỮ LIỆU ĐA NGƯỜI DÙNG ---
 def get_repo():
-    # Lấy token từ Streamlit Secrets
     token = st.secrets["GITHUB_TOKEN"]
     repo_name = st.secrets["REPO_NAME"]
     g = Github(token)
     return g.get_repo(repo_name)
 
-def load_data_from_github():
+def load_full_database():
     try:
         repo = get_repo()
-        # Tìm file data.json
         contents = repo.get_contents(DATA_FILE)
         json_str = contents.decoded_content.decode()
         data = json.loads(json_str)
-        
-        manager = GPAManager()
-        for d in data:
-            manager.add_subject(d['code'], d['name'], d['semester'], d['credits'], d['score_10'])
-        return manager
-    except Exception as e:
-        # Nếu chưa có file hoặc lỗi, trả về manager rỗng
-        return GPAManager()
+        if isinstance(data, list):
+            return {"DEFAULT": data}
+        return data
+    except:
+        return {}
 
-def save_data_to_github():
+def save_current_student_to_github(student_id):
     try:
         repo = get_repo()
-        # Chuyển dữ liệu thành chuỗi JSON
-        json_str = json.dumps([s.to_dict() for s in st.session_state.manager.subjects], ensure_ascii=False, indent=2)
+        full_data = load_full_database()
+        
+        # Cập nhật dữ liệu của ID này
+        current_student_data = [s.to_dict() for s in st.session_state.manager.subjects]
+        full_data[student_id] = current_student_data
+        
+        json_str = json.dumps(full_data, ensure_ascii=False, indent=2)
         
         try:
-            # Thử lấy file cũ để update
             contents = repo.get_contents(DATA_FILE)
-            repo.update_file(contents.path, "Update GPA Data (Auto)", json_str, contents.sha)
-            st.toast("✅ Đã lưu lên Đám Mây GitHub!", icon="☁️")
+            repo.update_file(contents.path, f"Update data for {student_id}", json_str, contents.sha)
+            st.toast(f"✅ Đã lưu dữ liệu cho {student_id}!", icon="☁️")
         except:
-            # Nếu chưa có file thì tạo mới
-            repo.create_file(DATA_FILE, "Init GPA Data", json_str)
+            repo.create_file(DATA_FILE, "Init Database", json_str)
             st.toast("✅ Đã tạo file dữ liệu mới!", icon="☁️")
     except Exception as e:
         st.error(f"Lỗi lưu GitHub: {e}")
 
-# --- BACKEND (LOGIC CŨ) ---
+# --- BACKEND ---
 class Subject:
     def __init__(self, code, name, semester, credits, score_10):
         self.code = code.strip().upper()
@@ -108,26 +119,46 @@ class GPAManager:
             sem_dict[sub.semester].append(sub)
         return dict(sorted(sem_dict.items()))
 
-# --- KHỞI TẠO DỮ LIỆU TỪ GITHUB ---
-if 'manager' not in st.session_state:
-    with st.spinner("Đang tải dữ liệu từ Đám Mây..."):
-        st.session_state.manager = load_data_from_github()
+# --- GIAO DIỆN CHÍNH ---
+st.title("🎓 GPA Manager - Multi User")
 
-# --- GIAO DIỆN ---
-st.title("GPA")
-
+# --- SIDEBAR ---
 with st.sidebar:
+    st.header("🔑 Đăng Nhập")
+    student_id = st.text_input("Nhập Mã Số SV / ID:", key="student_id_input", placeholder="VD: 2021001")
+    
+    st.divider()
     st.header("Hệ Thống")
-    if st.button("🔄 Đồng Bộ Ngay (Tải lại)", type="primary"):
-        st.session_state.manager = load_data_from_github()
-        st.rerun()
+    if student_id:
+        if st.button("🔄 Đồng Bộ Ngay (Tải lại)", type="primary"):
+            if 'full_db' in st.session_state: del st.session_state.full_db
+            st.rerun()
+        st.success(f"User: **{student_id}**")
+    else:
+        st.warning("Nhập ID để xem dữ liệu.")
 
+if not student_id:
+    st.info("👈 Vui lòng nhập **Mã Số Sinh Viên (ID)** ở thanh bên trái để bắt đầu.")
+    st.stop()
 
+# Load Data
+if 'manager' not in st.session_state or st.session_state.get('current_id') != student_id:
+    with st.spinner(f"Đang tải dữ liệu của {student_id}..."):
+        full_db = load_full_database()
+        st.session_state.full_db = full_db
+        manager = GPAManager()
+        student_data = full_db.get(student_id, [])
+        for d in student_data:
+            manager.add_subject(d['code'], d['name'], d['semester'], d['credits'], d['score_10'])
+        st.session_state.manager = manager
+        st.session_state.current_id = student_id
+
+# --- TABS ---
 tab1, tab2, tab3 = st.tabs(["1. Dữ Liệu", "2. Chi Tiết", "3. Biểu Đồ"])
 
 with tab1:
     with st.container(border=True):
-        st.subheader("Thông Tin Môn Học")
+        st.subheader(f"Thông Tin Môn Học ({student_id})")
         
         # Tìm kiếm
         c_s1, c_s2 = st.columns([3,1])
@@ -162,22 +193,20 @@ with tab1:
         with c4: cred = st.number_input("TC", 1, 20, key="k_cred")
         with c5: score = st.number_input("Điểm", 0.0, 10.0, step=0.1, key="k_score")
 
-        b1, b2, b3, b4 = st.columns(4)
+        # NÚT BẤM (Đã xóa nút Clear)
+        b1, b2, b3 = st.columns(3)
         if b1.button("Thêm", use_container_width=True):
             if code:
                 st.session_state.manager.add_subject(code, name, sem, cred, score)
-                save_data_to_github() # LƯU LÊN CLOUD
+                save_current_student_to_github(student_id)
                 st.rerun()
         if b2.button("Sửa", use_container_width=True):
             st.session_state.manager.update_subject(code, name, sem, cred, score)
-            save_data_to_github() # LƯU LÊN CLOUD
+            save_current_student_to_github(student_id)
             st.rerun()
         if b3.button("Xóa", use_container_width=True):
             st.session_state.manager.delete_subject(code, sem)
-            save_data_to_github() # LƯU LÊN CLOUD
-            st.rerun()
-        if b4.button("Clear", use_container_width=True):
-            st.session_state.k_code = ""; st.session_state.k_name = ""; st.session_state.k_score = 0.0
+            save_current_student_to_github(student_id)
             st.rerun()
 
     # Table
@@ -187,11 +216,13 @@ with tab1:
         table_data.append({"HK": sub.semester, "Mã": sub.code, "Tên": f"{sub.name}{note}", "TC": sub.credits, "Điểm": sub.score_10, "Chữ": sub.score_char})
     if table_data:
         st.dataframe(pd.DataFrame(table_data).sort_values("HK"), use_container_width=True, hide_index=True)
+    else:
+        st.info("Chưa có dữ liệu cho ID này.")
     
     accum, cpa = st.session_state.manager.calculate_cpa()
     st.divider()
     m1, m2 = st.columns(2)
-    m1.metric("GPA Tích Lũy", f"{cpa:.2f}")
+    m1.metric("CPA Tích Lũy", f"{cpa:.2f}")
     m2.metric("Tín Chỉ Tích Lũy", f"{accum}")
 
 with tab2:
