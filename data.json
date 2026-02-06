@@ -134,6 +134,13 @@
       "semester": "232",
       "credits": 3,
       "score_10": 7.2
+    },
+    {
+      "code": "ME2113",
+      "name": "Quản Lý Thu Mua",
+      "semester": "232",
+      "credits": 3,
+      "score_10": 6.9
     }
   ]
 }
