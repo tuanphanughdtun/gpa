@@ -119,7 +119,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA Manager - Multi User")
+st.title("🎓 GPA")
 
 with st.sidebar:
     st.header("🔑 Đăng Nhập")
