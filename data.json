@@ -92,6 +92,13 @@
       "semester": "231",
       "credits": 3,
       "score_10": 7.7
+    },
+    {
+      "code": "MT1009",
+      "name": "Phương Pháp Tính",
+      "semester": "231",
+      "credits": 3,
+      "score_10": 8.3
     }
   ]
 }
