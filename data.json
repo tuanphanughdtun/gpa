@@ -1,9 +1,20 @@
-[
-  {
-    "code": "ME1001",
-    "name": "Nhập Môn",
-    "semester": "222",
-    "credits": 3,
-    "score_10": 9.5
-  }
-]
+{
+  "DEFAULT": [
+    {
+      "code": "ME1001",
+      "name": "Nhập Môn",
+      "semester": "222",
+      "credits": 3,
+      "score_10": 9.5
+    }
+  ],
+  "2252875": [
+    {
+      "code": "ME1001",
+      "name": "Nhập Môn Kỹ Thuật",
+      "semester": "221",
+      "credits": 3,
+      "score_10": 9.5
+    }
+  ]
+}
