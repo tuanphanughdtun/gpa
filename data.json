@@ -64,6 +64,13 @@
       "semester": "222",
       "credits": 1,
       "score_10": 7.8
+    },
+    {
+      "code": "PH1005",
+      "name": "Vật Lý 2",
+      "semester": "222",
+      "credits": 4,
+      "score_10": 5.5
     }
   ]
 }
