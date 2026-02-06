@@ -78,6 +78,13 @@
       "semester": "223",
       "credits": 3,
       "score_10": 7.0
+    },
+    {
+      "code": "ME2125",
+      "name": "Quản Lý Logistics",
+      "semester": "231",
+      "credits": 3,
+      "score_10": 7.3
     }
   ]
 }
