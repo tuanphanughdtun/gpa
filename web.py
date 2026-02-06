@@ -8,13 +8,13 @@ from github import Github
 st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
 DATA_FILE = "data.json"
 
-# --- CSS ĐỂ CĂN TRÁI SỐ TRONG Ô NHẬP LIỆU ---
+# --- CSS: CĂN TRÁI CHO SỐ VÀ BẢNG ---
 st.markdown("""
 <style>
     /* Căn trái chữ số bên trong ô nhập liệu */
     input[inputmode="decimal"] { text-align: left !important; }
     input[type="number"] { text-align: left !important; }
-    /* Căn trái tiêu đề cột trong bảng */
+    /* Căn trái tiêu đề và nội dung bảng */
     th { text-align: left !important; }
     td { text-align: left !important; }
 </style>
@@ -111,7 +111,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA")
+st.title("🎓 GPA Manager - Multi User")
 
 with st.sidebar:
     st.header("🔑 Đăng Nhập")
@@ -189,7 +189,7 @@ with tab1:
             st.session_state.manager.delete_subject(code, sem)
             save_current_student_to_github(student_id); st.rerun()
 
-    # Bảng dữ liệu - CĂN TRÁI TOÀN BỘ
+    # --- BẢNG DỮ LIỆU TAB 1 ---
     table_data = []
     for sub in st.session_state.manager.subjects:
         note = st.session_state.manager.get_comparison_note(sub)
@@ -198,15 +198,15 @@ with tab1:
             "Mã": sub.code, 
             "Tên": f"{sub.name}{note}", 
             "TC": sub.credits, 
-            "Điểm": sub.score_10, 
+            "Điểm (10)": f"{sub.score_10:.2f}", # Format 2 số lẻ
+            "Điểm (4)": f"{sub.score_4:.2f}",   # Thêm cột điểm 4
             "Chữ": sub.score_char
         })
     
     if table_data:
         df = pd.DataFrame(table_data).sort_values("HK")
         st.dataframe(
-            df.style.set_properties(**{'text-align': 'left'})
-              .set_table_styles([dict(selector='th', props=[('text-align', 'left')])]),
+            df.style.set_properties(**{'text-align': 'left'}),
             use_container_width=True, hide_index=True
         )
     else: st.info("Chưa có dữ liệu.")
@@ -214,7 +214,7 @@ with tab1:
     accum, cpa = st.session_state.manager.calculate_cpa()
     st.divider()
     m1, m2 = st.columns(2)
-    m1.metric("GPA Tích Lũy", f"{cpa:.2f}")
+    m1.metric("CPA Tích Lũy", f"{cpa:.2f}")
     m2.metric("Tín Chỉ Tích Lũy", f"{accum}")
 
 with tab2:
@@ -223,22 +223,22 @@ with tab2:
         tc = sum(s.credits for s in subs)
         gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
         with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f})", expanded=True):
-            # [CẬP NHẬT MỚI] Tạo dữ liệu bảng chi tiết CÓ GHI CHÚ
+            # --- BẢNG DỮ LIỆU TAB 2 (CHI TIẾT) ---
             sem_table_data = []
             for s in subs:
                 note = st.session_state.manager.get_comparison_note(s)
                 sem_table_data.append({
                     "Mã": s.code,
-                    "Tên": f"{s.name}{note}", # Thêm ghi chú so sánh vào đây
+                    "Tên": f"{s.name}{note}",
                     "TC": s.credits,
-                    "Điểm": s.score_10
+                    "Điểm (10)": f"{s.score_10:.2f}", # Format 2 số lẻ
+                    "Điểm (4)": f"{s.score_4:.2f}",   # Thêm cột điểm 4
+                    "Chữ": s.score_char               # Thêm cột điểm Chữ
                 })
             
             df_sem = pd.DataFrame(sem_table_data)
-            # Căn trái bảng chi tiết
             st.dataframe(
-                df_sem.style.set_properties(**{'text-align': 'left'})
-                  .set_table_styles([dict(selector='th', props=[('text-align', 'left')])]),
+                df_sem.style.set_properties(**{'text-align': 'left'}),
                 use_container_width=True, hide_index=True
             )
 
