@@ -249,7 +249,7 @@ with tab2:
                     "TC": str(s.credits),
                     "Điểm (10)": f"{s.score_10:.1f}",
                     "Điểm (4)": f"{s.score_4:.1f}",
-                    "Chữ": s.score_char
+                    "Điểm Chữ": s.score_char
                 })
             
             df_sem = pd.DataFrame(sem_table_data)
