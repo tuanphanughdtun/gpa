@@ -120,6 +120,13 @@
       "semester": "232",
       "credits": 4,
       "score_10": 7.6
+    },
+    {
+      "code": "ME2111",
+      "name": "Thiết Kế Công Việc Và Nhân Trắc Học",
+      "semester": "232",
+      "credits": 3,
+      "score_10": 8.2
     }
   ]
 }
