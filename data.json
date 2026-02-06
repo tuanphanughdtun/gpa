@@ -253,6 +253,13 @@
       "semester": "251",
       "credits": 3,
       "score_10": 8.5
+    },
+    {
+      "code": "ME4607",
+      "name": "Phân Tích và Thiết Kế HTTTQL",
+      "semester": "251",
+      "credits": 3,
+      "score_10": 7.8
     }
   ]
 }
