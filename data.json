@@ -211,6 +211,13 @@
       "semester": "242",
       "credits": 2,
       "score_10": 8.5
+    },
+    {
+      "code": "ME2153",
+      "name": "Thực Hành Quản Lý Dự Án",
+      "semester": "251",
+      "credits": 2,
+      "score_10": 8.5
     }
   ]
 }
