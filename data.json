@@ -50,6 +50,13 @@
       "semester": "222",
       "credits": 4,
       "score_10": 6.2
+    },
+    {
+      "code": "ME1009",
+      "name": "Quản Lý Sản Xuất",
+      "semester": "222",
+      "credits": 3,
+      "score_10": 7.6
     }
   ]
 }
