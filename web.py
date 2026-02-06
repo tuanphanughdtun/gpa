@@ -275,4 +275,38 @@ with tab1:
 with tab2:
     sem_data = st.session_state.manager.get_sem_data()
     for sem, subs in sem_data.items():
-        tc = sum(s.credits for
+        tc = sum(s.credits for s in subs)
+        gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
+        rank_sem = st.session_state.manager.get_rank(gpa)
+        
+        with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f} - {rank_sem})", expanded=True):
+            sem_table_data = []
+            for s in subs:
+                note = st.session_state.manager.get_comparison_note(s)
+                sem_table_data.append({
+                    "Mã": s.code,
+                    "Tên": f"{s.name}{note}",
+                    "TC": str(s.credits),
+                    "Điểm (10)": f"{s.score_10:.1f}",
+                    "Điểm (4)": f"{s.score_4:.1f}",
+                    "Chữ": s.score_char
+                })
+            
+            df_sem = pd.DataFrame(sem_table_data)
+            st.dataframe(
+                df_sem.style.set_properties(**{'text-align': 'left'}),
+                use_container_width=True, hide_index=True
+            )
+
+with tab3:
+    sem_data = st.session_state.manager.get_sem_data()
+    if sem_data:
+        sems, gpas = [], []
+        for sem, subs in sem_data.items():
+            tc = sum(s.credits for s in subs)
+            gpas.append(sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0)
+            sems.append(sem)
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(sems, gpas, 'o-', color='green'); ax.set_ylim(0, 4); ax.grid(True, linestyle='--')
+        for i, v in enumerate(gpas): ax.text(i, v+0.1, f"{v:.2f}", ha='center')
+        st.pyplot(fig)
