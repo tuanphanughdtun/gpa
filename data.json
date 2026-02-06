@@ -148,6 +148,13 @@
       "semester": "233",
       "credits": 2,
       "score_10": 8.3
+    },
+    {
+      "code": "ME3299",
+      "name": "Chuỗi Cung Ứng Điện Tử",
+      "semester": "241",
+      "credits": 3,
+      "score_10": 7.8
     }
   ]
 }
