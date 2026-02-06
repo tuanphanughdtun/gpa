@@ -99,6 +99,13 @@
       "semester": "231",
       "credits": 3,
       "score_10": 8.3
+    },
+    {
+      "code": "ME2049",
+      "name": "Ứng Dụng Máy Tính Trong Công Nghiệp",
+      "semester": "231",
+      "credits": 3,
+      "score_10": 8.1
     }
   ]
 }
