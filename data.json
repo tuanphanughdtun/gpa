@@ -113,6 +113,13 @@
       "semester": "231",
       "credits": 2,
       "score_10": 7.5
+    },
+    {
+      "code": "MT2013",
+      "name": "Xác Suất Và Thống Kê",
+      "semester": "232",
+      "credits": 4,
+      "score_10": 7.6
     }
   ]
 }
