@@ -239,6 +239,13 @@
       "semester": "251",
       "credits": 3,
       "score_10": 8.8
+    },
+    {
+      "code": "ME4021",
+      "name": "Vận Tải Hàng Hoá",
+      "semester": "251",
+      "credits": 3,
+      "score_10": 5.8
     }
   ]
 }
