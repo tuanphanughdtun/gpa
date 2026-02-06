@@ -127,6 +127,13 @@
       "semester": "232",
       "credits": 3,
       "score_10": 8.2
+    },
+    {
+      "code": "ME2051",
+      "name": "Vận Trù Học",
+      "semester": "232",
+      "credits": 3,
+      "score_10": 7.2
     }
   ]
 }
