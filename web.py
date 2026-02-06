@@ -209,7 +209,7 @@ with tab1:
             "TC": str(sub.credits), 
             "Điểm (10)": f"{sub.score_10:.1f}", 
             "Điểm (4)": f"{sub.score_4:.1f}", 
-            "Chữ": sub.score_char
+            "Điểm Chữ": sub.score_char
         })
     
     if table_data:
