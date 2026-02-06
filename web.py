@@ -154,7 +154,7 @@ with tab1:
     with st.container(border=True):
         st.subheader(f"Thông Tin Môn Học ({student_id})")
 
-        # [QUAN TRỌNG] CHUẨN BỊ DỮ LIỆU BẢNG TRƯỚC
+        # --- CHUẨN BỊ DỮ LIỆU BẢNG ---
         table_data = []
         for sub in st.session_state.manager.subjects:
             note = st.session_state.manager.get_comparison_note(sub)
@@ -165,34 +165,29 @@ with tab1:
                 "TC": str(sub.credits), 
                 "Điểm (10)": f"{sub.score_10:.1f}", 
                 "Điểm (4)": f"{sub.score_4:.1f}", 
-                "Chữ": sub.score_char
+                "Điểm Chữ": sub.score_char
             })
         
-        # [FIX LỖI KEYERROR] CHỈ TẠO DATAFRAME KHI CÓ DỮ LIỆU
         if table_data:
             df = pd.DataFrame(table_data).sort_values("HK")
         else:
-            df = pd.DataFrame() # Tạo bảng rỗng nếu chưa có dữ liệu
+            df = pd.DataFrame()
 
-        # [QUAN TRỌNG] XỬ LÝ CLICK BẢNG TẠI ĐÂY (TRƯỚC KHI VẼ FORM)
+        # --- XỬ LÝ CLICK BẢNG ---
         if not df.empty and "main_table_key" in st.session_state:
             selection = st.session_state.main_table_key.get("selection", {})
             if selection and "rows" in selection and len(selection["rows"]) > 0:
                 selected_idx = selection["rows"][0]
-                
-                if "last_selected_idx" not in st.session_state:
-                    st.session_state.last_selected_idx = -1
+                if "last_selected_idx" not in st.session_state: st.session_state.last_selected_idx = -1
                 
                 if selected_idx != st.session_state.last_selected_idx:
                     row_data = df.iloc[selected_idx]
                     sel_code = row_data["Mã"]
                     sel_sem = row_data["HK"]
-                    
                     found_sub = None
                     for s in st.session_state.manager.subjects:
                         if s.code == sel_code and s.semester == sel_sem:
                             found_sub = s; break
-                    
                     if found_sub:
                         st.session_state.k_sem = found_sub.semester
                         st.session_state.k_code = found_sub.code
@@ -202,7 +197,7 @@ with tab1:
                         st.session_state.last_selected_idx = selected_idx
                         st.rerun()
 
-        # --- PHẦN VẼ FORM NHẬP LIỆU ---
+        # --- FORM NHẬP LIỆU ---
         c_s1, c_s2 = st.columns([3,1])
         with c_s1: search_q = st.text_input("Tìm kiếm môn:", key="search_q")
         with c_s2: 
@@ -221,7 +216,6 @@ with tab1:
                     st.session_state.k_score = found.score_10
                     st.rerun()
         
-        # Init state
         if 'k_sem' not in st.session_state: st.session_state.k_sem = ""
         if 'k_code' not in st.session_state: st.session_state.k_code = ""
         if 'k_name' not in st.session_state: st.session_state.k_name = ""
@@ -247,7 +241,7 @@ with tab1:
             st.session_state.manager.delete_subject(code, sem)
             save_current_student_to_github(student_id); st.rerun()
 
-    # --- VẼ BẢNG DỮ LIỆU ---
+    # --- VẼ BẢNG ---
     if not df.empty:
         st.dataframe(
             df.style.set_properties(**{'text-align': 'left'}),
@@ -272,11 +266,15 @@ with tab2:
     sem_data = st.session_state.manager.get_sem_data()
     for sem, subs in sem_data.items():
         tc = sum(s.credits for s in subs)
-        gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-        rank_sem = st.session_state.manager.get_rank(gpa)
+        # Tính toán điểm
+        gpa_4 = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
+        gpa_10 = sum(s.score_10 * s.credits for s in subs)/tc if tc>0 else 0
+        rank_sem = st.session_state.manager.get_rank(gpa_4)
         
-        # [CẬP NHẬT] Thêm "Tín chỉ: {tc}" vào tiêu đề
-        with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f} - {rank_sem} | Tín chỉ: {tc})", expanded=True):
+        # [CẬP NHẬT] Tiêu đề chi tiết đầy đủ thông tin
+        label = f"Học Kỳ {sem} | Tín chỉ: {tc} | GPA(10): {gpa_10:.2f} | GPA(4): {gpa_4:.2f} - {rank_sem}"
+        
+        with st.expander(label, expanded=True):
             sem_table_data = []
             for s in subs:
                 note = st.session_state.manager.get_comparison_note(s)
@@ -286,7 +284,7 @@ with tab2:
                     "TC": str(s.credits),
                     "Điểm (10)": f"{s.score_10:.1f}",
                     "Điểm (4)": f"{s.score_4:.1f}",
-                    "Chữ": s.score_char
+                    "Điểm Chữ": s.score_char
                 })
             
             df_sem = pd.DataFrame(sem_table_data)
@@ -298,12 +296,44 @@ with tab2:
 with tab3:
     sem_data = st.session_state.manager.get_sem_data()
     if sem_data:
-        sems, gpas = [], []
+        sems, gpas_4, gpas_10 = [], [], []
         for sem, subs in sem_data.items():
             tc = sum(s.credits for s in subs)
-            gpas.append(sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0)
+            g4 = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
+            g10 = sum(s.score_10 * s.credits for s in subs)/tc if tc>0 else 0
+            
             sems.append(sem)
-        fig, ax = plt.subplots(figsize=(10, 4))
-        ax.plot(sems, gpas, 'o-', color='green'); ax.set_ylim(0, 4); ax.grid(True, linestyle='--')
-        for i, v in enumerate(gpas): ax.text(i, v+0.1, f"{v:.2f}", ha='center')
+            gpas_4.append(g4)
+            gpas_10.append(g10)
+            
+        # [CẬP NHẬT] Vẽ 2 đường trên biểu đồ 2 trục
+        fig, ax1 = plt.subplots(figsize=(10, 5))
+
+        # Trục trái: Thang 10 (Màu đỏ)
+        color = 'tab:red'
+        ax1.set_xlabel('Học Kỳ')
+        ax1.set_ylabel('Thang 10', color=color)
+        ax1.plot(sems, gpas_10, 'o-', color=color, label='GPA Thang 10')
+        ax1.tick_params(axis='y', labelcolor=color)
+        ax1.set_ylim(0, 10.5)
+        ax1.grid(True, linestyle='--', alpha=0.5)
+        
+        # Hiện số trên đường thang 10
+        for i, v in enumerate(gpas_10):
+            ax1.text(i, v + 0.2, f"{v:.2f}", color=color, ha='center', fontweight='bold')
+
+        # Trục phải: Thang 4 (Màu xanh)
+        ax2 = ax1.twinx()  
+        color = 'tab:green'
+        ax2.set_ylabel('Thang 4', color=color)
+        ax2.plot(sems, gpas_4, 's-', color=color, label='GPA Thang 4')
+        ax2.tick_params(axis='y', labelcolor=color)
+        ax2.set_ylim(0, 4.5)
+        
+        # Hiện số trên đường thang 4
+        for i, v in enumerate(gpas_4):
+            ax2.text(i, v - 0.2, f"{v:.2f}", color=color, ha='center', fontweight='bold')
+
+        plt.title("Biểu đồ biến động điểm GPA (Thang 4 & 10)")
+        fig.tight_layout()
         st.pyplot(fig)
