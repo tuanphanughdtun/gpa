@@ -225,6 +225,13 @@
       "semester": "242",
       "credits": 3,
       "score_10": 7.5
+    },
+    {
+      "code": "ME2157",
+      "name": "Kiểm Soát Và Quản Lý Chất Lượng",
+      "semester": "242",
+      "credits": 3,
+      "score_10": 9.2
     }
   ]
 }
