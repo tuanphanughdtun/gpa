@@ -153,7 +153,60 @@ tab1, tab2, tab3 = st.tabs(["1. Dữ Liệu", "2. Chi Tiết", "3. Biểu Đồ"
 with tab1:
     with st.container(border=True):
         st.subheader(f"Thông Tin Môn Học ({student_id})")
+
+        # [QUAN TRỌNG] CHUẨN BỊ DỮ LIỆU BẢNG TRƯỚC
+        # Để xử lý sự kiện click TRƯỚC khi vẽ form nhập liệu
+        table_data = []
+        for sub in st.session_state.manager.subjects:
+            note = st.session_state.manager.get_comparison_note(sub)
+            table_data.append({
+                "HK": sub.semester, 
+                "Mã": sub.code, 
+                "Tên": f"{sub.name}{note}", 
+                "TC": str(sub.credits), 
+                "Điểm (10)": f"{sub.score_10:.1f}", 
+                "Điểm (4)": f"{sub.score_4:.1f}", 
+                "Chữ": sub.score_char
+            })
         
+        df = pd.DataFrame(table_data).sort_values("HK")
+
+        # [QUAN TRỌNG] XỬ LÝ CLICK BẢNG TẠI ĐÂY (TRƯỚC KHI VẼ FORM)
+        # Kiểm tra xem bảng có đang được chọn dòng nào không
+        if "main_table_key" in st.session_state:
+            selection = st.session_state.main_table_key.get("selection", {})
+            if selection and "rows" in selection and len(selection["rows"]) > 0:
+                selected_idx = selection["rows"][0]
+                
+                # Kiểm tra xem có phải là click mới không (tránh overwrite khi đang sửa)
+                if "last_selected_idx" not in st.session_state:
+                    st.session_state.last_selected_idx = -1
+                
+                if selected_idx != st.session_state.last_selected_idx:
+                    # Lấy dữ liệu từ dòng đã chọn
+                    row_data = df.iloc[selected_idx]
+                    sel_code = row_data["Mã"]
+                    sel_sem = row_data["HK"]
+                    
+                    # Tìm môn gốc trong danh sách
+                    found_sub = None
+                    for s in st.session_state.manager.subjects:
+                        if s.code == sel_code and s.semester == sel_sem:
+                            found_sub = s; break
+                    
+                    # Cập nhật Session State (biến Form)
+                    if found_sub:
+                        st.session_state.k_sem = found_sub.semester
+                        st.session_state.k_code = found_sub.code
+                        st.session_state.k_name = found_sub.name
+                        st.session_state.k_cred = found_sub.credits
+                        st.session_state.k_score = found_sub.score_10
+                        
+                        # Lưu lại index đã xử lý
+                        st.session_state.last_selected_idx = selected_idx
+                        st.rerun() # Refresh ngay lập tức để Form hiện dữ liệu mới
+
+        # --- PHẦN VẼ FORM NHẬP LIỆU (Giữ nguyên, nhưng giờ state đã an toàn) ---
         c_s1, c_s2 = st.columns([3,1])
         with c_s1: search_q = st.text_input("Tìm kiếm môn:", key="search_q")
         with c_s2: 
@@ -172,7 +225,7 @@ with tab1:
                     st.session_state.k_score = found.score_10
                     st.rerun()
         
-        # State Initialization
+        # Init state
         if 'k_sem' not in st.session_state: st.session_state.k_sem = ""
         if 'k_code' not in st.session_state: st.session_state.k_code = ""
         if 'k_name' not in st.session_state: st.session_state.k_name = ""
@@ -198,60 +251,16 @@ with tab1:
             st.session_state.manager.delete_subject(code, sem)
             save_current_student_to_github(student_id); st.rerun()
 
-    # --- BẢNG DỮ LIỆU TƯƠNG TÁC (CLICK TO SELECT) ---
-    table_data = []
-    for sub in st.session_state.manager.subjects:
-        note = st.session_state.manager.get_comparison_note(sub)
-        table_data.append({
-            "HK": sub.semester, 
-            "Mã": sub.code, 
-            "Tên": f"{sub.name}{note}", 
-            "TC": str(sub.credits), 
-            "Điểm (10)": f"{sub.score_10:.1f}", 
-            "Điểm (4)": f"{sub.score_4:.1f}", 
-            "Chữ": sub.score_char
-        })
-    
-    if table_data:
-        df = pd.DataFrame(table_data).sort_values("HK")
-        
-        # [MỚI] Bảng có khả năng chọn hàng (on_select)
-        event = st.dataframe(
+    # --- VẼ BẢNG DỮ LIỆU TƯƠNG TÁC ---
+    if not df.empty:
+        st.dataframe(
             df.style.set_properties(**{'text-align': 'left'}),
             use_container_width=True, 
             hide_index=True,
-            on_select="rerun",           # Bấm vào là chạy lại app để điền dữ liệu
-            selection_mode="single-row"  # Chỉ cho chọn 1 dòng
+            on_select="rerun",           # Bật tính năng click
+            selection_mode="single-row", # Chỉ chọn 1 dòng
+            key="main_table_key"         # [QUAN TRỌNG] Key để lấy dữ liệu ở đầu vòng lặp
         )
-        
-        # [MỚI] Xử lý khi người dùng chọn 1 dòng
-        if len(event.selection.rows) > 0:
-            selected_idx = event.selection.rows[0]
-            # Lấy dữ liệu từ dòng đã chọn (lưu ý df đã sort nên phải dùng iloc)
-            selected_row = df.iloc[selected_idx]
-            
-            sel_code = selected_row["Mã"]
-            sel_sem = selected_row["HK"]
-            
-            # Tìm môn học gốc trong database để lấy dữ liệu sạch (số thực, tên gốc)
-            found_sub = None
-            for s in st.session_state.manager.subjects:
-                if s.code == sel_code and s.semester == sel_sem:
-                    found_sub = s; break
-            
-            # Điền lên form nếu tìm thấy và dữ liệu đang khác nhau
-            if found_sub:
-                if (st.session_state.k_code != found_sub.code or 
-                    st.session_state.k_sem != found_sub.semester or
-                    st.session_state.k_score != found_sub.score_10):
-                    
-                    st.session_state.k_sem = found_sub.semester
-                    st.session_state.k_code = found_sub.code
-                    st.session_state.k_name = found_sub.name
-                    st.session_state.k_cred = found_sub.credits
-                    st.session_state.k_score = found_sub.score_10
-                    st.rerun()
-
     else: st.info("Chưa có dữ liệu.")
     
     accum, cpa = st.session_state.manager.calculate_cpa()
@@ -266,38 +275,4 @@ with tab1:
 with tab2:
     sem_data = st.session_state.manager.get_sem_data()
     for sem, subs in sem_data.items():
-        tc = sum(s.credits for s in subs)
-        gpa = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-        rank_sem = st.session_state.manager.get_rank(gpa)
-        
-        with st.expander(f"Học Kỳ {sem} (GPA: {gpa:.2f} - {rank_sem})", expanded=True):
-            sem_table_data = []
-            for s in subs:
-                note = st.session_state.manager.get_comparison_note(s)
-                sem_table_data.append({
-                    "Mã": s.code,
-                    "Tên": f"{s.name}{note}",
-                    "TC": str(s.credits),
-                    "Điểm (10)": f"{s.score_10:.1f}",
-                    "Điểm (4)": f"{s.score_4:.1f}",
-                    "Chữ": s.score_char
-                })
-            
-            df_sem = pd.DataFrame(sem_table_data)
-            st.dataframe(
-                df_sem.style.set_properties(**{'text-align': 'left'}),
-                use_container_width=True, hide_index=True
-            )
-
-with tab3:
-    sem_data = st.session_state.manager.get_sem_data()
-    if sem_data:
-        sems, gpas = [], []
-        for sem, subs in sem_data.items():
-            tc = sum(s.credits for s in subs)
-            gpas.append(sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0)
-            sems.append(sem)
-        fig, ax = plt.subplots(figsize=(10, 4))
-        ax.plot(sems, gpas, 'o-', color='green'); ax.set_ylim(0, 4); ax.grid(True, linestyle='--')
-        for i, v in enumerate(gpas): ax.text(i, v+0.1, f"{v:.2f}", ha='center')
-        st.pyplot(fig)
+        tc = sum(s.credits for
