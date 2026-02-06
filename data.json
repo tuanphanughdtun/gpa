@@ -260,6 +260,13 @@
       "semester": "251",
       "credits": 3,
       "score_10": 7.8
+    },
+    {
+      "code": "SP1037",
+      "name": "Tư Tưởng Hồ Chí Minh",
+      "semester": "251",
+      "credits": 2,
+      "score_10": 7.0
     }
   ]
 }
