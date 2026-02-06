@@ -116,7 +116,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA")
+st.title("🎓 GPA Manager - Bảo Mật")
 
 # --- SIDEBAR: ĐĂNG NHẬP ---
 with st.sidebar:
