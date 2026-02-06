@@ -57,6 +57,13 @@
       "semester": "222",
       "credits": 3,
       "score_10": 7.6
+    },
+    {
+      "code": "PH1007",
+      "name": "Thí Nghiệm Vật Lý",
+      "semester": "222",
+      "credits": 1,
+      "score_10": 7.8
     }
   ]
 }
