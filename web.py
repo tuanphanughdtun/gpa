@@ -5,7 +5,7 @@ import json
 from github import Github
 
 # --- CẤU HÌNH ---
-st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
+st.set_page_config(page_title="GPA", layout="wide", page_icon="🎓")
 DATA_FILE = "data.json"
 
 # --- CSS: CĂN TRÁI CHO SỐ VÀ BẢNG ---
@@ -119,7 +119,7 @@ class GPAManager:
         return dict(sorted(sem_dict.items()))
 
 # --- GIAO DIỆN CHÍNH ---
-st.title("🎓 GPA Manager - Multi User")
+st.title("🎓 GPA")
 
 with st.sidebar:
     st.header("🔑 Đăng Nhập")
