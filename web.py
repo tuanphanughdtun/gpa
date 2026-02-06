@@ -191,7 +191,7 @@ with tab1:
     accum, cpa = st.session_state.manager.calculate_cpa()
     st.divider()
     m1, m2 = st.columns(2)
-    m1.metric("CPA Tích Lũy", f"{cpa:.2f}")
+    m1.metric("GPA Tích Lũy", f"{cpa:.2f}")
     m2.metric("Tín Chỉ Tích Lũy", f"{accum}")
 
 with tab2:
