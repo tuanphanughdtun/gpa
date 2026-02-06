@@ -218,6 +218,13 @@
       "semester": "242",
       "credits": 2,
       "score_10": 8.5
+    },
+    {
+      "code": "ME3253",
+      "name": "Hoạch Định Mặt Bằng",
+      "semester": "242",
+      "credits": 3,
+      "score_10": 7.5
     }
   ]
 }
