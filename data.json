@@ -8,265 +8,268 @@
       "score_10": 9.5
     }
   ],
-  "2252875": [
-    {
-      "code": "ME1001",
-      "name": "Nhập Môn Về Kỹ Thuật",
-      "semester": "221",
-      "credits": 3,
-      "score_10": 9.5
-    },
-    {
-      "code": "PH1003",
-      "name": "Vật Lý 1",
-      "semester": "221",
-      "credits": 4,
-      "score_10": 4.4
-    },
-    {
-      "code": "MT1003",
-      "name": "Giải Tích 1",
-      "semester": "221",
-      "credits": 4,
-      "score_10": 6.9
-    },
-    {
-      "code": "CH1003",
-      "name": "Hoá Đại Cương",
-      "semester": "221",
-      "credits": 3,
-      "score_10": 7.4
-    },
-    {
-      "code": "MT1007",
-      "name": "Đại Số Tuyến Tính",
-      "semester": "222",
-      "credits": 3,
-      "score_10": 7.0
-    },
-    {
-      "code": "MT1005",
-      "name": "Giải Tích 2",
-      "semester": "222",
-      "credits": 4,
-      "score_10": 6.2
-    },
-    {
-      "code": "ME1009",
-      "name": "Quản Lý Sản Xuất",
-      "semester": "222",
-      "credits": 3,
-      "score_10": 7.6
-    },
-    {
-      "code": "PH1007",
-      "name": "Thí Nghiệm Vật Lý",
-      "semester": "222",
-      "credits": 1,
-      "score_10": 7.8
-    },
-    {
-      "code": "PH1005",
-      "name": "Vật Lý 2",
-      "semester": "222",
-      "credits": 4,
-      "score_10": 5.5
-    },
-    {
-      "code": "SP1031",
-      "name": "Triết Học Mác - Lênin",
-      "semester": "223",
-      "credits": 3,
-      "score_10": 7.0
-    },
-    {
-      "code": "ME2125",
-      "name": "Quản Lý Logistics",
-      "semester": "231",
-      "credits": 3,
-      "score_10": 7.3
-    },
-    {
-      "code": "ME2123",
-      "name": "Kỹ Thuật Hệ Thống",
-      "semester": "231",
-      "credits": 3,
-      "score_10": 7.7
-    },
-    {
-      "code": "MT1009",
-      "name": "Phương Pháp Tính",
-      "semester": "231",
-      "credits": 3,
-      "score_10": 8.3
-    },
-    {
-      "code": "ME2049",
-      "name": "Ứng Dụng Máy Tính Trong Công Nghiệp",
-      "semester": "231",
-      "credits": 3,
-      "score_10": 8.1
-    },
-    {
-      "code": "SP1033",
-      "name": "Kinh Tế Chính Trị Mác - Lênin",
-      "semester": "231",
-      "credits": 2,
-      "score_10": 7.5
-    },
-    {
-      "code": "MT2013",
-      "name": "Xác Suất Và Thống Kê",
-      "semester": "232",
-      "credits": 4,
-      "score_10": 7.6
-    },
-    {
-      "code": "ME2111",
-      "name": "Thiết Kế Công Việc Và Nhân Trắc Học",
-      "semester": "232",
-      "credits": 3,
-      "score_10": 8.2
-    },
-    {
-      "code": "ME2051",
-      "name": "Vận Trù Học",
-      "semester": "232",
-      "credits": 3,
-      "score_10": 7.2
-    },
-    {
-      "code": "ME2113",
-      "name": "Quản Lý Thu Mua",
-      "semester": "232",
-      "credits": 3,
-      "score_10": 6.9
-    },
-    {
-      "code": "SP1035",
-      "name": "Chủ Nghĩa Xã hội Khoa Học",
-      "semester": "233",
-      "credits": 2,
-      "score_10": 8.3
-    },
-    {
-      "code": "ME3299",
-      "name": "Chuỗi Cung Ứng Điện Tử",
-      "semester": "241",
-      "credits": 3,
-      "score_10": 7.8
-    },
-    {
-      "code": "ME2151",
-      "name": "Quản Lý Chuỗi Cung Ứng",
-      "semester": "241",
-      "credits": 3,
-      "score_10": 7.8
-    },
-    {
-      "code": "ME2045",
-      "name": "Kinh Tế Kỹ Thuật",
-      "semester": "241",
-      "credits": 3,
-      "score_10": 7.9
-    },
-    {
-      "code": "ME2141",
-      "name": "Kỹ Thuật Dự Báo",
-      "semester": "241",
-      "credits": 3,
-      "score_10": 9.0
-    },
-    {
-      "code": "ME2143",
-      "name": "Thực Tập Đại Cương",
-      "semester": "241",
-      "credits": 2,
-      "score_10": 10.0
-    },
-    {
-      "code": "ME4625",
-      "name": "Kỹ Năng Lãnh Đạo",
-      "semester": "242",
-      "credits": 3,
-      "score_10": 7.5
-    },
-    {
-      "code": "ME3223",
-      "name": "Quản Lý Dự Án",
-      "semester": "242",
-      "credits": 3,
-      "score_10": 7.4
-    },
-    {
-      "code": "SP1039",
-      "name": "Lịch Sử ĐCSVN",
-      "semester": "242",
-      "credits": 2,
-      "score_10": 6.6
-    },
-    {
-      "code": "ME3129",
-      "name": "Thực Tập Ngoài Trường",
-      "semester": "242",
-      "credits": 2,
-      "score_10": 8.5
-    },
-    {
-      "code": "ME2153",
-      "name": "Thực Hành Quản Lý Dự Án",
-      "semester": "242",
-      "credits": 2,
-      "score_10": 8.5
-    },
-    {
-      "code": "ME3253",
-      "name": "Hoạch Định Mặt Bằng",
-      "semester": "242",
-      "credits": 3,
-      "score_10": 7.5
-    },
-    {
-      "code": "ME2157",
-      "name": "Kiểm Soát Và Quản Lý Chất Lượng",
-      "semester": "242",
-      "credits": 3,
-      "score_10": 9.2
-    },
-    {
-      "code": "ME4025",
-      "name": "Quản Lý Tồn kho Trong Chuỗi Cung Ứng",
-      "semester": "251",
-      "credits": 3,
-      "score_10": 8.8
-    },
-    {
-      "code": "ME4021",
-      "name": "Vận Tải Hàng Hoá",
-      "semester": "251",
-      "credits": 3,
-      "score_10": 5.8
-    },
-    {
-      "code": "ME4645",
-      "name": "Hệ Thống Logistics Thu Hồi",
-      "semester": "251",
-      "credits": 3,
-      "score_10": 8.5
-    },
-    {
-      "code": "ME4607",
-      "name": "Phân Tích Và Thiết Kế HTTTQL",
-      "semester": "251",
-      "credits": 3,
-      "score_10": 7.8
-    },
-    {
-      "code": "SP1037",
-      "name": "Tư Tưởng Hồ Chí Minh",
-      "semester": "251",
-      "credits": 2,
-      "score_10": 7.0
-    }
-  ]
+  "2252875": {
+    "password": "Tuan21092004@",
+    "data": [
+      {
+        "code": "ME1001",
+        "name": "Nhập Môn Về Kỹ Thuật",
+        "semester": "221",
+        "credits": 3,
+        "score_10": 9.5
+      },
+      {
+        "code": "PH1003",
+        "name": "Vật Lý 1",
+        "semester": "221",
+        "credits": 4,
+        "score_10": 4.4
+      },
+      {
+        "code": "MT1003",
+        "name": "Giải Tích 1",
+        "semester": "221",
+        "credits": 4,
+        "score_10": 6.9
+      },
+      {
+        "code": "CH1003",
+        "name": "Hoá Đại Cương",
+        "semester": "221",
+        "credits": 3,
+        "score_10": 7.4
+      },
+      {
+        "code": "MT1007",
+        "name": "Đại Số Tuyến Tính",
+        "semester": "222",
+        "credits": 3,
+        "score_10": 7.0
+      },
+      {
+        "code": "MT1005",
+        "name": "Giải Tích 2",
+        "semester": "222",
+        "credits": 4,
+        "score_10": 6.2
+      },
+      {
+        "code": "ME1009",
+        "name": "Quản Lý Sản Xuất",
+        "semester": "222",
+        "credits": 3,
+        "score_10": 7.6
+      },
+      {
+        "code": "PH1007",
+        "name": "Thí Nghiệm Vật Lý",
+        "semester": "222",
+        "credits": 1,
+        "score_10": 7.8
+      },
+      {
+        "code": "PH1005",
+        "name": "Vật Lý 2",
+        "semester": "222",
+        "credits": 4,
+        "score_10": 5.5
+      },
+      {
+        "code": "SP1031",
+        "name": "Triết Học Mác - Lênin",
+        "semester": "223",
+        "credits": 3,
+        "score_10": 7.0
+      },
+      {
+        "code": "ME2125",
+        "name": "Quản Lý Logistics",
+        "semester": "231",
+        "credits": 3,
+        "score_10": 7.3
+      },
+      {
+        "code": "ME2123",
+        "name": "Kỹ Thuật Hệ Thống",
+        "semester": "231",
+        "credits": 3,
+        "score_10": 7.7
+      },
+      {
+        "code": "MT1009",
+        "name": "Phương Pháp Tính",
+        "semester": "231",
+        "credits": 3,
+        "score_10": 8.3
+      },
+      {
+        "code": "ME2049",
+        "name": "Ứng Dụng Máy Tính Trong Công Nghiệp",
+        "semester": "231",
+        "credits": 3,
+        "score_10": 8.1
+      },
+      {
+        "code": "SP1033",
+        "name": "Kinh Tế Chính Trị Mác - Lênin",
+        "semester": "231",
+        "credits": 2,
+        "score_10": 7.5
+      },
+      {
+        "code": "MT2013",
+        "name": "Xác Suất Và Thống Kê",
+        "semester": "232",
+        "credits": 4,
+        "score_10": 7.6
+      },
+      {
+        "code": "ME2111",
+        "name": "Thiết Kế Công Việc Và Nhân Trắc Học",
+        "semester": "232",
+        "credits": 3,
+        "score_10": 8.2
+      },
+      {
+        "code": "ME2051",
+        "name": "Vận Trù Học",
+        "semester": "232",
+        "credits": 3,
+        "score_10": 7.2
+      },
+      {
+        "code": "ME2113",
+        "name": "Quản Lý Thu Mua",
+        "semester": "232",
+        "credits": 3,
+        "score_10": 6.9
+      },
+      {
+        "code": "SP1035",
+        "name": "Chủ Nghĩa Xã hội Khoa Học",
+        "semester": "233",
+        "credits": 2,
+        "score_10": 8.3
+      },
+      {
+        "code": "ME3299",
+        "name": "Chuỗi Cung Ứng Điện Tử",
+        "semester": "241",
+        "credits": 3,
+        "score_10": 7.8
+      },
+      {
+        "code": "ME2151",
+        "name": "Quản Lý Chuỗi Cung Ứng",
+        "semester": "241",
+        "credits": 3,
+        "score_10": 7.8
+      },
+      {
+        "code": "ME2045",
+        "name": "Kinh Tế Kỹ Thuật",
+        "semester": "241",
+        "credits": 3,
+        "score_10": 7.9
+      },
+      {
+        "code": "ME2141",
+        "name": "Kỹ Thuật Dự Báo",
+        "semester": "241",
+        "credits": 3,
+        "score_10": 9.0
+      },
+      {
+        "code": "ME2143",
+        "name": "Thực Tập Đại Cương",
+        "semester": "241",
+        "credits": 2,
+        "score_10": 10.0
+      },
+      {
+        "code": "ME4625",
+        "name": "Kỹ Năng Lãnh Đạo",
+        "semester": "242",
+        "credits": 3,
+        "score_10": 7.5
+      },
+      {
+        "code": "ME3223",
+        "name": "Quản Lý Dự Án",
+        "semester": "242",
+        "credits": 3,
+        "score_10": 7.4
+      },
+      {
+        "code": "SP1039",
+        "name": "Lịch Sử ĐCSVN",
+        "semester": "242",
+        "credits": 2,
+        "score_10": 6.6
+      },
+      {
+        "code": "ME3129",
+        "name": "Thực Tập Ngoài Trường",
+        "semester": "242",
+        "credits": 2,
+        "score_10": 8.5
+      },
+      {
+        "code": "ME2153",
+        "name": "Thực Hành Quản Lý Dự Án",
+        "semester": "242",
+        "credits": 2,
+        "score_10": 8.5
+      },
+      {
+        "code": "ME3253",
+        "name": "Hoạch Định Mặt Bằng",
+        "semester": "242",
+        "credits": 3,
+        "score_10": 7.5
+      },
+      {
+        "code": "ME2157",
+        "name": "Kiểm Soát Và Quản Lý Chất Lượng",
+        "semester": "242",
+        "credits": 3,
+        "score_10": 9.2
+      },
+      {
+        "code": "ME4025",
+        "name": "Quản Lý Tồn kho Trong Chuỗi Cung Ứng",
+        "semester": "251",
+        "credits": 3,
+        "score_10": 8.8
+      },
+      {
+        "code": "ME4021",
+        "name": "Vận Tải Hàng Hoá",
+        "semester": "251",
+        "credits": 3,
+        "score_10": 5.8
+      },
+      {
+        "code": "ME4645",
+        "name": "Hệ Thống Logistics Thu Hồi",
+        "semester": "251",
+        "credits": 3,
+        "score_10": 8.5
+      },
+      {
+        "code": "ME4607",
+        "name": "Phân Tích Và Thiết Kế HTTTQL",
+        "semester": "251",
+        "credits": 3,
+        "score_10": 7.8
+      },
+      {
+        "code": "SP1037",
+        "name": "Tư Tưởng Hồ Chí Minh",
+        "semester": "251",
+        "credits": 2,
+        "score_10": 7.0
+      }
+    ]
+  }
 }
