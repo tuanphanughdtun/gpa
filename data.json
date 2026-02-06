@@ -36,6 +36,13 @@
       "semester": "221",
       "credits": 3,
       "score_10": 7.4
+    },
+    {
+      "code": "MT1007",
+      "name": "Đại Số Tuyến Tính",
+      "semester": "222",
+      "credits": 3,
+      "score_10": 7.0
     }
   ]
 }
