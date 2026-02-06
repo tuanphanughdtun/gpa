@@ -71,6 +71,13 @@
       "semester": "222",
       "credits": 4,
       "score_10": 5.5
+    },
+    {
+      "code": "SP1031",
+      "name": "Triết Học Mác - Lênin",
+      "semester": "223",
+      "credits": 3,
+      "score_10": 7.0
     }
   ]
 }
