@@ -5,16 +5,14 @@ import json
 from github import Github
 
 # --- CẤU HÌNH ---
-st.set_page_config(page_title="GPA", layout="wide", page_icon="🎓")
+st.set_page_config(page_title="GPA Cloud Manager", layout="wide", page_icon="🎓")
 DATA_FILE = "data.json"
 
 # --- CSS: CĂN TRÁI CHO SỐ VÀ BẢNG ---
 st.markdown("""
 <style>
-    /* Căn trái chữ số bên trong ô nhập liệu */
     input[inputmode="decimal"] { text-align: left !important; }
     input[type="number"] { text-align: left !important; }
-    /* Căn trái tiêu đề và nội dung bảng */
     th { text-align: left !important; }
     td { text-align: left !important; }
 </style>
@@ -33,25 +31,24 @@ def load_full_database():
         contents = repo.get_contents(DATA_FILE)
         json_str = contents.decoded_content.decode()
         data = json.loads(json_str)
-        if isinstance(data, list): return {"DEFAULT": data}
+        # Nếu data rỗng hoặc list (cấu trúc cũ), convert sang dict
+        if isinstance(data, list): return {} 
         return data
     except: return {}
 
-def save_current_student_to_github(student_id):
+def save_database_to_github(full_data):
     try:
         repo = get_repo()
-        full_data = load_full_database()
-        current_student_data = [s.to_dict() for s in st.session_state.manager.subjects]
-        full_data[student_id] = current_student_data
         json_str = json.dumps(full_data, ensure_ascii=False, indent=2)
         try:
             contents = repo.get_contents(DATA_FILE)
-            repo.update_file(contents.path, f"Update {student_id}", json_str, contents.sha)
-            st.toast(f"✅ Đã lưu: {student_id}!", icon="☁️")
+            repo.update_file(contents.path, "Update Database", json_str, contents.sha)
         except:
             repo.create_file(DATA_FILE, "Init DB", json_str)
-            st.toast("✅ Đã tạo file mới!", icon="☁️")
-    except Exception as e: st.error(f"Lỗi GitHub: {e}")
+        return True
+    except Exception as e:
+        st.error(f"Lỗi GitHub: {e}")
+        return False
 
 # --- BACKEND ---
 class Subject:
@@ -121,40 +118,98 @@ class GPAManager:
 # --- GIAO DIỆN CHÍNH ---
 st.title("🎓 GPA")
 
+# --- SIDEBAR: ĐĂNG NHẬP ---
 with st.sidebar:
-    st.header("🔑 Đăng Nhập")
-    student_id = st.text_input("Nhập Mã Số SV / ID:", key="student_id_input", placeholder="VD: 2021001")
-    st.divider()
-    st.header("Hệ Thống")
-    if student_id:
-        if st.button("🔄 Đồng Bộ", type="primary"):
-            if 'full_db' in st.session_state: del st.session_state.full_db
-            st.rerun()
-        st.success(f"User: **{student_id}**")
-    else: st.warning("Nhập ID để xem.")
+    st.header("🔒 Đăng Nhập / Đăng Ký")
+    
+    input_id = st.text_input("Mã Số SV (ID):", placeholder="VD: 2021001").strip()
+    input_pass = st.text_input("Mật Khẩu:", type="password", placeholder="Nhập mật khẩu").strip()
+    
+    btn_login = st.button("🚀 Đăng Nhập / Tạo Mới", type="primary", use_container_width=True)
+    
+    # Logic Đăng Nhập
+    if btn_login:
+        if not input_id or not input_pass:
+            st.error("Vui lòng nhập đủ ID và Mật khẩu!")
+        else:
+            with st.spinner("Đang kiểm tra..."):
+                full_db = load_full_database()
+                
+                # Trường hợp 1: ID chưa tồn tại -> TẠO MỚI
+                if input_id not in full_db:
+                    full_db[input_id] = {"password": input_pass, "data": []}
+                    if save_database_to_github(full_db):
+                        st.success(f"Đã tạo tài khoản mới: {input_id}")
+                        st.session_state.current_user = input_id
+                        st.session_state.current_pass = input_pass
+                        st.session_state.manager = GPAManager()
+                        st.rerun()
+                
+                # Trường hợp 2: ID đã tồn tại -> KIỂM TRA PASSWORD
+                else:
+                    stored_user = full_db[input_id]
+                    # Hỗ trợ data cũ (chưa có pass) -> tự convert sang có pass
+                    if isinstance(stored_user, list):
+                        full_db[input_id] = {"password": input_pass, "data": stored_user}
+                        save_database_to_github(full_db)
+                        stored_pass = input_pass
+                        st.warning("Đã cập nhật bảo mật cho tài khoản cũ.")
+                    else:
+                        stored_pass = stored_user.get("password", "")
+                    
+                    if input_pass == stored_pass:
+                        st.success(f"Chào mừng {input_id} quay lại!")
+                        st.session_state.current_user = input_id
+                        st.session_state.current_pass = input_pass
+                        
+                        # Load dữ liệu vào manager
+                        manager = GPAManager()
+                        user_data_list = full_db[input_id].get("data", [])
+                        for d in user_data_list:
+                            manager.add_subject(d['code'], d['name'], d['semester'], d['credits'], d['score_10'])
+                        st.session_state.manager = manager
+                        st.rerun()
+                    else:
+                        st.error("Sai mật khẩu! Vui lòng thử lại.")
 
-if not student_id:
-    st.info("👈 Vui lòng nhập **Mã Số Sinh Viên (ID)** ở thanh bên trái.")
+    st.divider()
+    if 'current_user' in st.session_state:
+        st.info(f"Đang làm việc: **{st.session_state.current_user}**")
+        if st.button("Đăng Xuất"):
+            for key in list(st.session_state.keys()): del st.session_state[key]
+            st.rerun()
+
+# --- CHẶN TRUY CẬP NẾU CHƯA LOGIN ---
+if 'current_user' not in st.session_state:
+    st.info("👈 Vui lòng nhập **ID và Mật Khẩu** ở thanh bên trái để bắt đầu.")
+    st.warning("Nếu ID chưa tồn tại, hệ thống sẽ tự động tạo tài khoản mới với mật khẩu bạn nhập.")
     st.stop()
 
-# Load Data
-if 'manager' not in st.session_state or st.session_state.get('current_id') != student_id:
-    with st.spinner(f"Đang tải {student_id}..."):
+# --- HÀM LƯU DỮ LIỆU RIÊNG (ĐÃ LOGIN) ---
+def save_data():
+    try:
+        user_id = st.session_state.current_user
+        user_pass = st.session_state.current_pass
+        
         full_db = load_full_database()
-        st.session_state.full_db = full_db
-        manager = GPAManager()
-        student_data = full_db.get(student_id, [])
-        for d in student_data: manager.add_subject(d['code'], d['name'], d['semester'], d['credits'], d['score_10'])
-        st.session_state.manager = manager
-        st.session_state.current_id = student_id
+        
+        # Cập nhật data cho user hiện tại
+        current_list = [s.to_dict() for s in st.session_state.manager.subjects]
+        full_db[user_id] = {"password": user_pass, "data": current_list}
+        
+        if save_database_to_github(full_db):
+            st.toast(f"✅ Đã lưu dữ liệu cho {user_id}!", icon="☁️")
+    except Exception as e:
+        st.error(f"Lỗi khi lưu: {e}")
 
+# --- NỘI DUNG CHÍNH (ĐÃ LOGIN) ---
 tab1, tab2, tab3 = st.tabs(["1. Dữ Liệu", "2. Chi Tiết", "3. Biểu Đồ"])
 
 with tab1:
     with st.container(border=True):
-        st.subheader(f"Thông Tin Môn Học ({student_id})")
+        st.subheader(f"Thông Tin Môn Học ({st.session_state.current_user})")
 
-        # --- CHUẨN BỊ DỮ LIỆU BẢNG ---
+        # [1] CHUẨN BỊ DỮ LIỆU
         table_data = []
         for sub in st.session_state.manager.subjects:
             note = st.session_state.manager.get_comparison_note(sub)
@@ -165,7 +220,7 @@ with tab1:
                 "TC": str(sub.credits), 
                 "Điểm (10)": f"{sub.score_10:.1f}", 
                 "Điểm (4)": f"{sub.score_4:.1f}", 
-                "Điểm Chữ": sub.score_char
+                "Chữ": sub.score_char
             })
         
         if table_data:
@@ -173,7 +228,7 @@ with tab1:
         else:
             df = pd.DataFrame()
 
-        # --- XỬ LÝ CLICK BẢNG ---
+        # [2] XỬ LÝ CLICK
         if not df.empty and "main_table_key" in st.session_state:
             selection = st.session_state.main_table_key.get("selection", {})
             if selection and "rows" in selection and len(selection["rows"]) > 0:
@@ -184,10 +239,12 @@ with tab1:
                     row_data = df.iloc[selected_idx]
                     sel_code = row_data["Mã"]
                     sel_sem = row_data["HK"]
+                    
                     found_sub = None
                     for s in st.session_state.manager.subjects:
                         if s.code == sel_code and s.semester == sel_sem:
                             found_sub = s; break
+                    
                     if found_sub:
                         st.session_state.k_sem = found_sub.semester
                         st.session_state.k_code = found_sub.code
@@ -197,7 +254,7 @@ with tab1:
                         st.session_state.last_selected_idx = selected_idx
                         st.rerun()
 
-        # --- FORM NHẬP LIỆU ---
+        # [3] FORM NHẬP LIỆU
         c_s1, c_s2 = st.columns([3,1])
         with c_s1: search_q = st.text_input("Tìm kiếm môn:", key="search_q")
         with c_s2: 
@@ -233,23 +290,20 @@ with tab1:
         if b1.button("Thêm", use_container_width=True):
             if code:
                 st.session_state.manager.add_subject(code, name, sem, cred, score)
-                save_current_student_to_github(student_id); st.rerun()
+                save_data(); st.rerun()
         if b2.button("Sửa", use_container_width=True):
             st.session_state.manager.update_subject(code, name, sem, cred, score)
-            save_current_student_to_github(student_id); st.rerun()
+            save_data(); st.rerun()
         if b3.button("Xóa", use_container_width=True):
             st.session_state.manager.delete_subject(code, sem)
-            save_current_student_to_github(student_id); st.rerun()
+            save_data(); st.rerun()
 
-    # --- VẼ BẢNG ---
+    # [4] HIỂN THỊ BẢNG
     if not df.empty:
         st.dataframe(
             df.style.set_properties(**{'text-align': 'left'}),
-            use_container_width=True, 
-            hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row",
-            key="main_table_key"
+            use_container_width=True, hide_index=True,
+            on_select="rerun", selection_mode="single-row", key="main_table_key"
         )
     else: st.info("Chưa có dữ liệu.")
     
@@ -266,32 +320,23 @@ with tab2:
     sem_data = st.session_state.manager.get_sem_data()
     for sem, subs in sem_data.items():
         tc = sum(s.credits for s in subs)
-        # Tính toán điểm
-        gpa_4 = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-        gpa_10 = sum(s.score_10 * s.credits for s in subs)/tc if tc>0 else 0
+        if tc > 0:
+            gpa_4 = sum(s.score_4 * s.credits for s in subs) / tc
+            gpa_10 = sum(s.score_10 * s.credits for s in subs) / tc
+        else: gpa_4 = 0; gpa_10 = 0
+            
         rank_sem = st.session_state.manager.get_rank(gpa_4)
+        label_header = f"Học Kỳ {sem} | Tín chỉ: {tc} | GPA(4): {gpa_4:.2f} | GPA(10): {gpa_10:.2f} - {rank_sem}"
         
-        # [CẬP NHẬT] Tiêu đề chi tiết đầy đủ thông tin
-        label = f"Học Kỳ {sem} | Tín chỉ: {tc} | GPA(10): {gpa_10:.2f} | GPA(4): {gpa_4:.2f} - {rank_sem}"
-        
-        with st.expander(label, expanded=True):
+        with st.expander(label_header, expanded=True):
             sem_table_data = []
             for s in subs:
                 note = st.session_state.manager.get_comparison_note(s)
                 sem_table_data.append({
-                    "Mã": s.code,
-                    "Tên": f"{s.name}{note}",
-                    "TC": str(s.credits),
-                    "Điểm (10)": f"{s.score_10:.1f}",
-                    "Điểm (4)": f"{s.score_4:.1f}",
-                    "Điểm Chữ": s.score_char
+                    "Mã": s.code, "Tên": f"{s.name}{note}", "TC": str(s.credits),
+                    "Điểm (10)": f"{s.score_10:.1f}", "Điểm (4)": f"{s.score_4:.1f}", "Chữ": s.score_char
                 })
-            
-            df_sem = pd.DataFrame(sem_table_data)
-            st.dataframe(
-                df_sem.style.set_properties(**{'text-align': 'left'}),
-                use_container_width=True, hide_index=True
-            )
+            st.dataframe(pd.DataFrame(sem_table_data).style.set_properties(**{'text-align': 'left'}), use_container_width=True, hide_index=True)
 
 with tab3:
     sem_data = st.session_state.manager.get_sem_data()
@@ -299,41 +344,23 @@ with tab3:
         sems, gpas_4, gpas_10 = [], [], []
         for sem, subs in sem_data.items():
             tc = sum(s.credits for s in subs)
-            g4 = sum(s.score_4 * s.credits for s in subs)/tc if tc>0 else 0
-            g10 = sum(s.score_10 * s.credits for s in subs)/tc if tc>0 else 0
-            
+            if tc > 0:
+                gpas_4.append(sum(s.score_4 * s.credits for s in subs)/tc)
+                gpas_10.append(sum(s.score_10 * s.credits for s in subs)/tc)
+            else: gpas_4.append(0); gpas_10.append(0)
             sems.append(sem)
-            gpas_4.append(g4)
-            gpas_10.append(g10)
-            
-        # [CẬP NHẬT] Vẽ 2 đường trên biểu đồ 2 trục
-        fig, ax1 = plt.subplots(figsize=(10, 5))
-
-        # Trục trái: Thang 10 (Màu đỏ)
-        color = 'tab:red'
-        ax1.set_xlabel('Học Kỳ')
-        ax1.set_ylabel('Thang 10', color=color)
-        ax1.plot(sems, gpas_10, 'o-', color=color, label='GPA Thang 10')
-        ax1.tick_params(axis='y', labelcolor=color)
-        ax1.set_ylim(0, 10.5)
-        ax1.grid(True, linestyle='--', alpha=0.5)
         
-        # Hiện số trên đường thang 10
-        for i, v in enumerate(gpas_10):
-            ax1.text(i, v + 0.2, f"{v:.2f}", color=color, ha='center', fontweight='bold')
-
-        # Trục phải: Thang 4 (Màu xanh)
-        ax2 = ax1.twinx()  
-        color = 'tab:green'
-        ax2.set_ylabel('Thang 4', color=color)
-        ax2.plot(sems, gpas_4, 's-', color=color, label='GPA Thang 4')
-        ax2.tick_params(axis='y', labelcolor=color)
-        ax2.set_ylim(0, 4.5)
+        st.subheader("📈 Biểu đồ GPA Thang 4")
+        fig1, ax1 = plt.subplots(figsize=(10, 3))
+        ax1.plot(sems, gpas_4, 'o-', color='#2ca02c', linewidth=2)
+        ax1.set_ylim(0, 4.2); ax1.grid(True, linestyle='--', alpha=0.7)
+        for i, v in enumerate(gpas_4): ax1.text(i, v+0.1, f"{v:.2f}", ha='center')
+        st.pyplot(fig1)
         
-        # Hiện số trên đường thang 4
-        for i, v in enumerate(gpas_4):
-            ax2.text(i, v - 0.2, f"{v:.2f}", color=color, ha='center', fontweight='bold')
-
-        plt.title("Biểu đồ biến động điểm GPA (Thang 4 & 10)")
-        fig.tight_layout()
-        st.pyplot(fig)
+        st.divider()
+        st.subheader("📊 Biểu đồ GPA Thang 10")
+        fig2, ax2 = plt.subplots(figsize=(10, 3))
+        ax2.plot(sems, gpas_10, 'o-', color='#1f77b4', linewidth=2)
+        ax2.set_ylim(0, 10.5); ax2.grid(True, linestyle='--', alpha=0.7)
+        for i, v in enumerate(gpas_10): ax2.text(i, v+0.3, f"{v:.2f}", ha='center')
+        st.pyplot(fig2)
