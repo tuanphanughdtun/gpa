@@ -141,6 +141,13 @@
       "semester": "232",
       "credits": 3,
       "score_10": 6.9
+    },
+    {
+      "code": "SP1035",
+      "name": "Chủ Nghĩa Xã hội Khoa Học",
+      "semester": "233",
+      "credits": 2,
+      "score_10": 8.3
     }
   ]
 }
