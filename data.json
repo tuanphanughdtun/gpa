@@ -269,6 +269,13 @@
         "semester": "251",
         "credits": 2,
         "score_10": 7.0
+      },
+      {
+        "code": "SP1039",
+        "name": "Lịch Sử ĐCSVN",
+        "semester": "252",
+        "credits": 2,
+        "score_10": 7.0
       }
     ]
   }
